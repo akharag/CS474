@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     int M, N, Q;
     bool type;
     int val;
-    int glevel;
+    int glevel = 0;
 
     // read image header
     readImageHeader(argv[1], N, M, Q, type);
@@ -28,37 +28,30 @@ int main(int argc, char *argv[])
     // read image
     readImage(argv[1], image);
 
-    cout << "Enter Number of Grey Levels: ";
-    cin >> glevel;
-
-
-
-    if(glevel <= 256){
-        for(i = 0; i < N; i++)
-            for(j = 0; j < M; j++){
-                image.getPixelVal(i, j, val);
-                val = val - (256 % glevel);
-                image.setPixelVal(i, j, val)
-            }
-        /*for(i = 0; i < N-glevel+1; i+=glevel)
-            for(j = 0; j < M-glevel+1; j+=glevel){
-                image.getPixelVal(i, j, val); //sample pixel
-                for(int fillRow = 0; fillRow < glevel; fillRow++)
-                    for(int fillCol = 0; fillCol < glevel; fillCol++){
-                        image.setPixelVal(i+fillRow, j+fillCol, val);//fill values up to fill factor away
-                    }    
-            }*/
-        // write image
-        writeImage(argv[2], image);
-    }
-    else{
-        cout << "Grey Levels Must be Less than 256" << endl;
+    while (!glevel)
+    {
+        cout<< "Enter Number of Grey Levels: \n"
+            << "1) 128 \n"
+            << "2) 64 \n"
+            << "3) 32 \n"
+            << "4) 16 \n"
+            << "5) 8 \n"
+            << "6) 4 \n"
+            << "7) 2 \n";
+        cin >> glevel;
+        if (glevel < 1 || glevel > 7) glevel = 0;
     }
 
-
-
-
-
-
+    for(i = 0; i < N; i++)
+    {
+        for(j = 0; j < M; j++)
+        {
+            image.getPixelVal(i, j, val);
+            val >>= glevel;
+            image.setPixelVal(i, j, val);
+        }
+    }
+    image.setImageInfo(N, M, Q>>glevel);
+    writeImage(argv[2], image);
     return (1);
 }
