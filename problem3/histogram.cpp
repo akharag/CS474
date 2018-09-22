@@ -16,7 +16,9 @@ int main(int argc, char *argv[])
     int M, N, Q;
     bool type;
     int val;
-    int glevel = 0;
+
+    int ranges[256]={0};
+    double probabilities[256];
 
     // read image header
     readImageHeader(argv[1], N, M, Q, type);
@@ -28,30 +30,22 @@ int main(int argc, char *argv[])
     // read image
     readImage(argv[1], image);
 
-    while (!glevel)
-    {
-        cout<< "Enter Number of Grey Levels: \n"
-            << "1) 128 \n"
-            << "2) 64 \n"
-            << "3) 32 \n"
-            << "4) 16 \n"
-            << "5) 8 \n"
-            << "6) 4 \n"
-            << "7) 2 \n";
-        cin >> glevel;
-        if (glevel < 1 || glevel > 7) glevel = 0;
-    }
+    unsigned long pixels = N * M;
 
     for(i = 0; i < N; i++)
     {
         for(j = 0; j < M; j++)
         {
             image.getPixelVal(i, j, val);
-            val >>= glevel;
-            image.setPixelVal(i, j, val);
+            ranges[val]++;
         }
     }
-    image.setImageInfo(N, M, Q>>glevel);
-    writeImage(argv[2], image);
+    
+    for (int q = 0; q<256;q++)
+    {
+        probabilities[q] = (double)ranges[q] / pixels;
+        cout << "[" << q << "]:\t" << probabilities[q] << endl;
+    }
+    //writeImage(argv[2], image);  // Irrelevant when testing.
     return (1);
 }

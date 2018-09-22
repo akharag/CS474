@@ -3,9 +3,9 @@ DEBUG = -g
 CFLAGS = -Wall -c
 LFLAGS = -Wall
 
-GreyLevels:	image.h image.o ReadImage.o \
-	ReadImageHeader.o WriteImage.o GreyLevels.cpp
-	$(CC) $(LFLAGS) image.o ReadImage.o ReadImageHeader.o WriteImage.o GreyLevels.cpp -o GreyLevels
+histogram:	image.h image.o ReadImage.o \
+	ReadImageHeader.o WriteImage.o histogram.cpp
+	$(CC) $(LFLAGS) image.o ReadImage.o ReadImageHeader.o WriteImage.o histogram.cpp -o histogram
 
 ReadImage.o:	ReadImage.cpp
 	$(CC) $(CFLAGS) ReadImage.cpp
@@ -20,4 +20,4 @@ image.o:	image.cpp
 	$(CC) $(CFLAGS) image.cpp
 
 clean:
-		\rm *.o GreyLevels
+		\rm *.o histogram
