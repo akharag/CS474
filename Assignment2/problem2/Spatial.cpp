@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
     // allocate memory for the image array
 
     ImageType image(N, M, Q);
+    ImageType image2(N, M, Q);
 
     // read image
     readImage(argv[1], image);
@@ -69,11 +70,11 @@ int main(int argc, char *argv[])
     {
         for(j = 0; j < M; j++)
         {
-            image.setPixelVal(i, j, function(image, i, j));
+            image2.setPixelVal(i, j, function(image, i, j));
         }
         
     }
-    writeImage(argv[2], image);
+    writeImage(argv[2], image2);
     return 0;
 }
 
