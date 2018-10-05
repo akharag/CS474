@@ -1,0 +1,76 @@
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+#include <stdlib.h>
+#include <vector>
+
+#include "image.h"
+
+using namespace std;
+
+int readImageHeader(char[], int&, int&, int&, bool&);
+int readImage(char[], ImageType&);
+int writeImage(char[], ImageType&);
+
+int (*function)(ImageType&, int, int);
+
+int median7(ImageType&, int, int);
+int median15(ImageType&, int, int);
+
+
+int main(int argc, char *argv[])
+{
+    int i, j; 
+    int M, N, Q;
+    bool type;
+
+    function = median7;
+
+    // read image header
+    readImageHeader(argv[1], N, M, Q, type);
+
+    // allocate memory for the image array
+
+    ImageType image(N, M, Q);
+    ImageType image2(N, M, Q);
+
+    // read image
+    readImage(argv[1], image);
+
+    for(i = 0; i < N; i++)
+    {
+        for(j = 0; j < M; j++)
+        {
+            image2.setPixelVal(i, j, function(image, i, j));
+        }
+        
+    }
+    writeImage(argv[2], image2);
+    return 0;
+}
+
+int median7(ImageType& image, int x, int y)
+{
+    int width;
+    int height;
+    int value;
+    image.getImageInfo(width, height, value);
+    int total = 49;
+    vector<int> sort_vector;
+    for (int j = 0; j < 7; j++)
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            if (x + i - 3 < 0 || y + j - 3 < 0 || x + i - 3 > width-1 || y + j - 3 > height-1)
+            {
+                total --;
+                continue;
+            }
+            image.getPixelVal(x+i-3, y+j-3, value);
+            sort_vector.push_back(value);
+        }
+    }
+    sort(sort_vector.begin(), sort_vector.end());
+    return sort_vector[total/2];
+}
+
