@@ -42,15 +42,15 @@ int main(int argc, char *argv[])
         }
 
     //start correlation 
-    for(i = n/2; i < N ; i++)
-        for(j = n/2; j < M - 2; j++)
+    for(i = 1; i < N ; i++)
+        for(j = 1; j < M - 2; j++)
         {
             new_val = 0;
-            for(mask_row = -n/2; mask_row < n/2; mask_row++)
-                for(mask_col = -m/2; mask_col < m/2; mask_col++)
+            for(mask_row = 0; mask_row < n; mask_row++)
+                for(mask_col = 0; mask_col < m; mask_col++)
                 {
                     buffer.getPixelVal(i+mask_row, j+mask_col, val);
-                    mask.getPixelVal(n/2+mask_row, n/2+mask_col, mask_val); 
+                    mask.getPixelVal(mask_row, mask_col, mask_val); 
                     //g(i,j) = sum of w(i,j)*f(i,j)
                     new_val = new_val + val*mask_val;
                 }
