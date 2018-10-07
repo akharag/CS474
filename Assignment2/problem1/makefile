@@ -3,9 +3,9 @@ DEBUG = -g
 CFLAGS = -Wall -c
 LFLAGS = -Wall
 
-SizingFactor:	image.h image.o ReadImage.o \
-	ReadImageHeader.o WriteImage.o SizingFactor.cpp
-	$(CC) $(LFLAGS) image.o ReadImage.o ReadImageHeader.o WriteImage.o SizingFactor.cpp -o SizingFactor
+Correlation:	image.h image.o ReadImage.o \
+	ReadImageHeader.o WriteImage.o Correlation.cpp
+	$(CC) $(LFLAGS) image.o ReadImage.o ReadImageHeader.o WriteImage.o Correlation.cpp -o Correlation
 
 ReadImage.o:	ReadImage.cpp
 	$(CC) $(CFLAGS) ReadImage.cpp
@@ -20,4 +20,4 @@ image.o:	image.cpp
 	$(CC) $(CFLAGS) image.cpp
 
 clean:
-		\rm *.o SizingFactor
+		\rm *.o Correlation
