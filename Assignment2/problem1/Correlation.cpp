@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <math.h>
 
 #include "image.h"
 
@@ -16,7 +17,7 @@ int main(int argc, char *argv[])
     int M, N, Q, n, m, q;
     bool type;
     int val, new_val, mask_val;
-    int weight;
+    //int weight;
 
     // read image header
     readImageHeader(argv[1], N, M, Q, type);
@@ -43,19 +44,26 @@ int main(int argc, char *argv[])
 
     //start correlation 
     for(i = 1; i < N ; i++)
+    {
         for(j = 1; j < M - 2; j++)
         {
             new_val = 0;
             for(mask_row = 0; mask_row < n; mask_row++)
+            {
                 for(mask_col = 0; mask_col < m; mask_col++)
                 {
                     buffer.getPixelVal(i+mask_row, j+mask_col, val);
                     mask.getPixelVal(mask_row, mask_col, mask_val); 
                     //g(i,j) = sum of w(i,j)*f(i,j)
-                    new_val = new_val + val*mask_val;
+                    new_val += val*mask_val;
                 }
+            }
+            double scale = double(new_val) / (n*m*q*q);
+            scale = sqrt(sqrt(scale));
+            new_val = int(scale * 255);
             output.setPixelVal(i, j, new_val);
         }  
+    }  
 
     //copy back to old image size
     for(i = 0; i < N; i++)
