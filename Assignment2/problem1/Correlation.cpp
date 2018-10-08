@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
 
     ImageType image(N, M, Q);
     ImageType mask(n, m, q);
-    ImageType output(N+2*n, M+2*m, Q);
-    ImageType buffer(N+2*n, M+2*m, Q);
+    ImageType output(N+n, M+m, Q);
+    ImageType buffer(N+n, M+m, Q);
 
     // read image
     readImage(argv[1], image);
@@ -36,12 +36,15 @@ int main(int argc, char *argv[])
 
     //copy image with padding
     for(i = 0; i < N; i++)
+    {
         for(j =0; j < M; j++)
         {
             image.getPixelVal(i, j, val);
-            buffer.setPixelVal(i+n, j+m, val);
+            buffer.setPixelVal(i, j, val);
         }
-
+    }
+    int largest = 0;
+    double array [N][M];
     //start correlation 
     for(i = 1; i < N ; i++)
     {
@@ -58,19 +61,29 @@ int main(int argc, char *argv[])
                     new_val += val*mask_val;
                 }
             }
-            double scale = double(new_val) / (n*m*q*q);
-            scale = sqrt(sqrt(scale));
-            new_val = int(scale * 255);
-            output.setPixelVal(i, j, new_val);
+            if (new_val > largest)
+            {
+                largest = new_val;
+            }
+            array[i][j] = new_val;
         }  
     }  
+    for(i = 1; i < N ; i++)
+    {
+        for(j = 1; j < M - 2; j++)
+        {
+            array[i][j] /= largest;
+            array[i][j] *= 255;
+            cout << array[i][j] << endl;
+        }  
+    }  
+    
 
     //copy back to old image size
     for(i = 0; i < N; i++)
         for(j = 0; j < M; j++)
         {
-            output.getPixelVal(i+n, j+m, val);
-            image.setPixelVal(i, j, val);
+            image.setPixelVal(i, j, int(array[i][j]));
         }
 
         // write image
