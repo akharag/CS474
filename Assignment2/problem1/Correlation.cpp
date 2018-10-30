@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <math.h>
 
 #include "image.h"
 
@@ -16,7 +17,7 @@ int main(int argc, char *argv[])
     int M, N, Q, n, m, q;
     bool type;
     int val, new_val, mask_val;
-    int weight;
+    //int weight;
 
     // read image header
     readImageHeader(argv[1], N, M, Q, type);
@@ -26,8 +27,8 @@ int main(int argc, char *argv[])
 
     ImageType image(N, M, Q);
     ImageType mask(n, m, q);
-    ImageType output(N+2*n, M+2*m, Q);
-    ImageType buffer(N+2*n, M+2*m, Q);
+    ImageType output(N+n, M+m, Q);
+    ImageType buffer(N+n, M+m, Q);
 
     // read image
     readImage(argv[1], image);
@@ -35,34 +36,54 @@ int main(int argc, char *argv[])
 
     //copy image with padding
     for(i = 0; i < N; i++)
+    {
         for(j =0; j < M; j++)
         {
             image.getPixelVal(i, j, val);
-            buffer.setPixelVal(i+n, j+m, val);
+            buffer.setPixelVal(i, j, val);
         }
-
+    }
+    int largest = 0;
+    double array [N][M];
     //start correlation 
     for(i = 1; i < N ; i++)
+    {
         for(j = 1; j < M - 2; j++)
         {
             new_val = 0;
             for(mask_row = 0; mask_row < n; mask_row++)
+            {
                 for(mask_col = 0; mask_col < m; mask_col++)
                 {
                     buffer.getPixelVal(i+mask_row, j+mask_col, val);
                     mask.getPixelVal(mask_row, mask_col, mask_val); 
                     //g(i,j) = sum of w(i,j)*f(i,j)
-                    new_val = new_val + val*mask_val;
+                    new_val += val*mask_val;
                 }
-            output.setPixelVal(i, j, new_val);
+            }
+            if (new_val > largest)
+            {
+                largest = new_val;
+            }
+            array[i][j] = new_val;
         }  
+    }  
+    for(i = 1; i < N ; i++)
+    {
+        for(j = 1; j < M - 2; j++)
+        {
+            array[i][j] /= largest;
+            array[i][j] *= 255;
+            cout << array[i][j] << endl;
+        }  
+    }  
+    
 
     //copy back to old image size
     for(i = 0; i < N; i++)
         for(j = 0; j < M; j++)
         {
-            output.getPixelVal(i+n, j+m, val);
-            image.setPixelVal(i, j, val);
+            image.setPixelVal(i, j, int(array[i][j]));
         }
 
         // write image
