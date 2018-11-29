@@ -5,6 +5,7 @@
 #include "pgm_fft.h"
 
 #define SWAP(a,b) tempr=(a);(a)=(b);(b)=tempr
+#define PI 3.141592
 /*
  * Note: This function has been modified so that the initial padding is not necessary
  * And it does scale by 1/N at the end of the forward FFT
@@ -291,24 +292,70 @@ void pgm_image_shift(struct pgm_image *image)
     }
 }
 
-void motionblur(struct pgm_image* image)
+void pgm_c_image_shift(struct pgm_image *image)
 {
-
+    if (!image)
+    {
+        return;
+    }
+    if (!image->data)
+    {
+        return;
+    }
+    unsigned long long total = image->x * image->y;
+    char *data = (char *) malloc(total);
+    for (unsigned long long y = 0; y < image->y; y++)
+    {
+        unsigned int v = (y + (image->y / 2)) % image->y;
+        for (unsigned long long x=0; x < image->x; x++)
+        {
+            unsigned int u = (x + (image->x / 2)) % image->x;
+            data[x + image->x*y] = image->data[u+image->x*v];
+        }
+    }
+    for (unsigned long long p =0; p < total; p++)
+    {
+        image->data[p] = data[p];
+    }
 }
 
-void inverseFiltering(struct pgm_image * item)
+void motionblur(struct pgm_complex* c_image)
 {
-    
+    for(unsigned int i = 0; i < c_image->n; i++)
+        for(unsigned int j=0; j < c_image->m; j++)
+        {
+
+            c_image->data[j*c_image->n + i] *= H(0.1,0.1,1,i,j);
+        }      
 }
 
-void wienerfilter(struct pgm_image* image)
+void inverseFiltering(struct pgm_complex* c_image)
 {
+    for(unsigned int i = 0; i < c_image->n; i++)
+        for(unsigned int j=0; j < c_image->m; j++)
+        {
 
+            c_image->data[j*c_image->n + i] /= H(0.1,0.1,1,i,j);
+        }  
+}
+
+void wienerfilter(struct pgm_complex* c_image, float k)
+{
+    for(unsigned int i = 0; i < c_image->n; i++)
+        for(unsigned int j=0; j < c_image->m; j++)
+        {
+            double _Complex h = H(0.1,0.1,1,i,j));
+            double _Complex H2 = cpow(cabs(h),2);
+
+
+            c_image->data[j*c_image->n + i] =  (H2/(H2+k))*(c_image->data[j*c_image->n + i]/h) 
+        }
 }
 
 float box_muller(float m, float s)  /* normal random variate generator */
 {                       /* mean m, standard deviation s */
     float x1, x2, w, y1;
+    
     static float y2;
     static int use_last = 0;
 
@@ -333,4 +380,10 @@ float box_muller(float m, float s)  /* normal random variate generator */
 
     return( m + y1 * s );
 }
+
+double _Complex H(double a, double b, int T, int u, int v)
+{
+    return T*sin(PI*(u*a+v*b))*cexp(I*PI*(u*a+v*b))/(PI*(u*a+v*b));
+}
+
 #undef SWAP

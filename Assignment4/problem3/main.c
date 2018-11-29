@@ -1,92 +1,27 @@
 #include <stdio.h>
 #include <math.h>
+#include "pgm_reader.h"
+#include "pgm_fft.h"
 
-#define SWAP(a,b) tempr=(a);(a)=(b);(b)=tempr
-
-void fft(float *data, unsigned long nn, int isign);
 int main()
 {
-    float data[4] = {2.0, 3.0, 4.0, 4.0};
-    for (int x = 0; x < 4; x++)
+    struct pgm_image *image = pgm_image_create_open("./input_files/lenna.pgm");
+    if (!image)
     {
-        printf("%g\n", data[x]);
+        printf("Error opening file\n");
+        return -1;
     }
-    fft(data, 2, -1);
-    printf("----------------\n");
-    for (int x = 0; x < 4; x++)
-    {
-        printf("%g\n", data[x]);
-    }
-    fft(data, 2, 1);
-    printf("----------------\n");
-    for (int x = 0; x < 4; x++)
-    {
-        printf("%g\n", data[x]);
-    }
+    struct pgm_complex *c_image = pgm_complex_new(image);
+    pgm_complex_fft(c_image, FORWARD_FFT);
+    struct pgm_image *r_image = pgm_image_create_new(image->x, image->y, image->format, image->limit);
+    struct pgm_image *i_image = pgm_image_create_new(image->x, image->y, image->format, image->limit);
+    pgm_complex_decompose(c_image, r_image, i_image);
+    pgm_image_shift(r_image);
+    motionblur(c_image);
+    pgm_complex_to_real(c_image, image);
+
+
     return 0;
 }
 
 
-/*
- * Note: This function has been modified so that the initial padding is not necessary
- * And it does scale by 1/N at the end of the forward FFT
- */
-void fft(float *_data, unsigned long nn, int isign)
-{
-    unsigned long n,mmax,m,j,istep,i;
-    double wtemp,wr,wpr,wpi,wi,theta;
-    float tempr,tempi;
-    float *data = _data - 1;
-    n=nn << 1;
-    j=1;
-    for (i=1;i<n;i+=2) 
-    {
-        if (j > i) 
-        {
-            SWAP(data[j],data[i]);
-            SWAP(data[j+1],data[i+1]);
-        }
-        m=n >> 1;
-        while (m >= 2 && j > m) 
-        {
-            j -= m;
-            m >>= 1;
-        }
-        j += m;
-    }
-    mmax=2;
-    while (n > mmax) 
-    {
-        istep=mmax << 1;
-        theta=isign*(6.28318530717959/mmax);
-        wtemp=sin(0.5*theta);
-        wpr = -2.0*wtemp*wtemp;
-        wpi=sin(theta);
-        wr=1.0;
-        wi=0.0;
-        for (m=1;m<mmax;m+=2) 
-        {
-            for (i=m;i<=n;i+=istep) 
-            {
-                j=i+mmax;
-                tempr=wr*data[j]-wi*data[j+1];
-                tempi=wr*data[j+1]+wi*data[j];
-                data[j]=data[i]-tempr;
-                data[j+1]=data[i+1]-tempi;
-                data[i] += tempr;
-                data[i+1] += tempi;
-            }
-            wr=(wtemp=wr)*wpr-wi*wpi+wr;
-            wi=wi*wpr+wtemp*wpi+wi;
-        }
-        mmax=istep;
-    }
-    if (isign == -1)
-    {
-        for (int ffa=0; ffa < nn*2; ffa++)
-        {
-            _data[ffa] /= nn;
-        }
-    }
-}
-#undef SWAP
