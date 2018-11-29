@@ -13,7 +13,7 @@ int main()
     printf("Original Data \n");
     for (int x = 0; x < N; x++)
     {
-        data[x] = sin(6.28318530717959*u*x/N);
+        data[x] = cos((6.28318530717959*u*x)/N);
         printf("%g\n", data[x]);
     }
     printf("Forward FFT");

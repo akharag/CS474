@@ -1,23 +1,8 @@
-CC = g++
-DEBUG = -g
-CFLAGS = -Wall -c
-LFLAGS = -Wall
+all: main
 
-Spatial:	image.h image.o ReadImage.o \
-	ReadImageHeader.o WriteImage.o Spatial.cpp
-	$(CC) $(LFLAGS) image.o ReadImage.o ReadImageHeader.o WriteImage.o Spatial.cpp -o Spatial
-
-ReadImage.o:	ReadImage.cpp
-	$(CC) $(CFLAGS) ReadImage.cpp
-
-ReadImageHeader.o:	ReadImageHeader.cpp
-	$(CC) $(CFLAGS) ReadImageHeader.cpp
-
-WriteImage.o:	WriteImage.cpp
-	$(CC) $(CFLAGS) WriteImage.cpp
-
-image.o:	image.cpp
-	$(CC) $(CFLAGS) image.cpp
+main: main.c
+	gcc main.c -o main -lm -std=c11
 
 clean:
-		\rm *.o Spatial
+		\rm *.o main
+
