@@ -304,7 +304,7 @@ void pgm_c_image_shift(struct pgm_complex *image)
         return;
     }
     unsigned long long total = image->n * image->m;
-    char *data = (char *) malloc(sizeof(double _Complex) * total);
+    double _Complex *data = (double _Complex *) malloc(sizeof(double _Complex) * total);
     for (unsigned long long y = 0; y < image->m; y++)
     {
         unsigned int v = (y + (image->m / 2)) % image->m;
@@ -326,7 +326,8 @@ void motionblur(struct pgm_complex* c_image)
     for(unsigned int i = 0; i < c_image->n; i++)
         for(unsigned int j=0; j < c_image->m; j++)
         {
-            c_image->data[j*c_image->n + i] *= H(0.1,0.1,1,i,j);
+            double _Complex h = H(0.1,0.1,1,i,j);
+            c_image->data[j*c_image->n + i] *= h;
         }      
 }
 
@@ -346,7 +347,7 @@ void wienerfilter(struct pgm_complex* c_image, float k)
         {
             double _Complex h = H(0.1,0.1,1,i,j);
             double _Complex H2 = cpow(cabs(h),2);
-            c_image->data[j*c_image->n + i] =  (H2/(H2+k))*(c_image->data[j*c_image->n + i]/h) 
+            c_image->data[j*c_image->n + i] =  (H2/(H2+k))*(c_image->data[j*c_image->n + i]/h);
         }
 }
 
