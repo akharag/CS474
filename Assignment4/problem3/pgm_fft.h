@@ -28,4 +28,7 @@ char                 pgm_complex_fft(struct pgm_complex *, int);
 void                 pgm_complex_print(struct pgm_complex *);
 void                 pgm_complex_save(struct pgm_complex *, char*);
 void                 pgm_image_shift(struct pgm_image *);
+void                 inverseFiltering(struct pgm_image * item);
+void                 wienerfilter(struct pgm_image* image);
+void                 motionblur(struct pgm_image* image);
 #endif
