@@ -290,9 +290,10 @@ void pgm_image_shift(struct pgm_image *image)
     {
         image->data[p] = data[p];
     }
+    free((void *) data);
 }
 
-void pgm_c_image_shift(struct pgm_image *image)
+void pgm_c_image_shift(struct pgm_complex *image)
 {
     if (!image)
     {
@@ -302,21 +303,22 @@ void pgm_c_image_shift(struct pgm_image *image)
     {
         return;
     }
-    unsigned long long total = image->x * image->y;
-    char *data = (char *) malloc(total);
-    for (unsigned long long y = 0; y < image->y; y++)
+    unsigned long long total = image->n * image->m;
+    char *data = (char *) malloc(sizeof(double _Complex) * total);
+    for (unsigned long long y = 0; y < image->m; y++)
     {
-        unsigned int v = (y + (image->y / 2)) % image->y;
-        for (unsigned long long x=0; x < image->x; x++)
+        unsigned int v = (y + (image->m / 2)) % image->m;
+        for (unsigned long long x=0; x < image->n; x++)
         {
-            unsigned int u = (x + (image->x / 2)) % image->x;
-            data[x + image->x*y] = image->data[u+image->x*v];
+            unsigned int u = (x + (image->n / 2)) % image->n;
+            data[x + image->n*y] = image->data[u+image->n*v];
         }
     }
     for (unsigned long long p =0; p < total; p++)
     {
         image->data[p] = data[p];
     }
+    free((void *) data);
 }
 
 void motionblur(struct pgm_complex* c_image)
@@ -324,7 +326,6 @@ void motionblur(struct pgm_complex* c_image)
     for(unsigned int i = 0; i < c_image->n; i++)
         for(unsigned int j=0; j < c_image->m; j++)
         {
-
             c_image->data[j*c_image->n + i] *= H(0.1,0.1,1,i,j);
         }      
 }
@@ -334,7 +335,6 @@ void inverseFiltering(struct pgm_complex* c_image)
     for(unsigned int i = 0; i < c_image->n; i++)
         for(unsigned int j=0; j < c_image->m; j++)
         {
-
             c_image->data[j*c_image->n + i] /= H(0.1,0.1,1,i,j);
         }  
 }
@@ -344,10 +344,8 @@ void wienerfilter(struct pgm_complex* c_image, float k)
     for(unsigned int i = 0; i < c_image->n; i++)
         for(unsigned int j=0; j < c_image->m; j++)
         {
-            double _Complex h = H(0.1,0.1,1,i,j));
+            double _Complex h = H(0.1,0.1,1,i,j);
             double _Complex H2 = cpow(cabs(h),2);
-
-
             c_image->data[j*c_image->n + i] =  (H2/(H2+k))*(c_image->data[j*c_image->n + i]/h) 
         }
 }

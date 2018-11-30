@@ -289,5 +289,6 @@ void pgm_image_shift(struct pgm_image *image)
     {
         image->data[p] = data[p];
     }
+    free((void *) data);
 }
 #undef SWAP
