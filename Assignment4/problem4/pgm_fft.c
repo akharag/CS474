@@ -355,8 +355,8 @@ void pgm_complex_shift(struct pgm_complex *c_image)
 
 double high_pass(unsigned int u, unsigned int v)
 {
-    double gamma_h = 1.5f;
-    double gamma_l = 0.5f;
+    double gamma_h = 1.45f;
+    double gamma_l = 0.80f;
     double d_0 = 1.8f;
     return (gamma_h - gamma_l) * ( 1.0 - exp( -(double)( (u*u) + (v*v) ) / (d_0 * d_0))) + gamma_l;
 }
