@@ -22,6 +22,7 @@ int main()
     pgm_c_image_shift(c_image);
     pgm_complex_fft(c_image, BACKWARD_FFT);
     pgm_complex_to_real(c_image, image);
+    pgm_image_noise(image);
     pgm_image_save(image, "./output_files/lenna_blur.pgm");
 
 

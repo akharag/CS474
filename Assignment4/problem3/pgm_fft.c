@@ -385,4 +385,13 @@ double _Complex H(double a, double b, int T, int u, int v)
     return T*sin(PI*(u*a+v*b))*cexp(I*PI*(u*a+v*b))/(PI*(u*a+v*b));
 }
 
+void pgm_image_noise(struct pgm_image *image)
+{
+    unsigned long total = image->x * image->y;
+    for (unsigned long i = 0; i < total; i++)
+    {
+        image->data[i] += box_muller(0, 10);
+    }
+}
+
 #undef SWAP

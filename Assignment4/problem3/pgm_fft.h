@@ -31,6 +31,7 @@ void                 pgm_c_image_shift(struct pgm_complex *);
 void                 inverseFiltering(struct pgm_complex * item);
 void                 wienerfilter(struct pgm_complex* image, float k);
 void                 motionblur(struct pgm_complex* image);
+void                 pgm_image_noise(struct pgm_image *);
 float                box_muller(float, float);
 double _Complex      H(double a, double b, int T, int u, int v);
 #endif
